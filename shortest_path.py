@@ -118,5 +118,62 @@ def on_click(event):
         canvas.draw()
 
 
+def zoom(event):
+    base_scale = 1.1
+    cur_xlim = ax.get_xlim()
+    cur_ylim = ax.get_ylim()
+
+    xdata = event.xdata
+    ydata = event.ydata
+
+    if event.button == 'up':
+        scale_factor = 1 / base_scale
+    elif event.button == 'down':
+        scale_factor = base_scale
+    else:
+        scale_factor = 1
+
+    new_width = (cur_xlim[1] - cur_xlim[0]) * scale_factor
+    new_height = (cur_ylim[1] - cur_ylim[0]) * scale_factor
+
+    relx = (cur_xlim[1] - xdata) / (cur_xlim[1] - cur_xlim[0])
+    rely = (cur_ylim[1] - ydata) / (cur_ylim[1] - cur_ylim[0])
+
+    ax.set_xlim([xdata - new_width * (1 - relx), xdata + new_width * relx])
+    ax.set_ylim([ydata - new_height * (1 - rely)])
+
+    canvas.draw()
+
+start_drag_x = None
+start_drag_y = None
+
+def on_right_press(event):
+    global start_drag_x, start_drag_y
+    start_drag_x = event.xdata
+    start_drag_y = event.ydata
+
+def on_right_drag(event):
+    if event.button == 3 and event.inaxes is not None:
+        if start_drag_x is None or start_drag_y is None:
+            return
+
+        try:
+            dx = start_drag_x - event.xdata
+            dy = start_drag_y - event.ydata
+
+            cur_xlim = ax.get_xlim()
+            cur_ylim = ax.get_ylim()
+
+            ax.set_xlim([cur_xlim[0] + dx, cur_xlim[1] + dx])
+            ax.set_ylim([cur_ylim[0] + dy, cur_ylim[1] + dy])
+        except Exception as e:
+            pass
+
+        canvas.draw()
+
+def on_right_release(event):
+    global start_drag_x, start_drag_y
+    start_drag_x = None
+    start_drag_y = None
 
 
