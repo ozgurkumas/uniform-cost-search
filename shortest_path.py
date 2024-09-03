@@ -176,4 +176,41 @@ def on_right_release(event):
     start_drag_x = None
     start_drag_y = None
 
+root = tk.Tk()
+root.wm_title("Map Visualization")
 
+frame = tk.Frame(root)
+frame.pack(fill=tk.BOTH, expand=1)
+
+def plot_map():
+    global ax, canvas
+
+    panel_width = 1200
+    panel_height = 600
+
+    fig, ax = ox.plot_graph(
+        G, 
+        node_size=10, 
+        edge_linewidth=1, 
+        show=False, 
+        close=False,
+        figsize=(panel_width/100, panel_height/100),
+        dpi=600 
+    )
+
+    frame.config(width=panel_width, height=panel_height)
+
+    canvas = FigureCanvasTkAgg(fig, master=frame)
+    canvas.draw()
+    canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+    canvas.mpl_connect('button_press_event', on_click)
+    canvas.mpl_connect('scroll_event', zoom)
+    canvas.mpl_connect('button_press_event', on_right_press)
+    canvas.mpl_connect('motion_notify_event', on_right_drag)
+    canvas.mpl_connect('button_release_event', on_right_release)
+
+plot_button = tk.Button(root, text="Plot Map", command=plot_map)
+plot_button.pack(side=tk.BOTTOM)
+
+tk.mainloop()
