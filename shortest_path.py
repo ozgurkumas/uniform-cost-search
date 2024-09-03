@@ -80,3 +80,43 @@ def find_shortest_path(startState, goalState):
     listPathNodes.reverse()
     return [node.id for node in listPathNodes]
 
+
+selected_nodes = []
+def on_click(event):
+    if event.button == 1 and event.inaxes is not None:
+        x_click, y_click = event.xdata, event.ydata
+        closest_node = ox.distance.nearest_nodes(G, x_click, y_click)
+        selected_nodes.append(closest_node)
+
+        x = G.nodes[closest_node]["x"]
+        y = G.nodes[closest_node]["y"]
+        ax.scatter(x, y, s=100, c="r", alpha=0.5, edgecolor="none")
+
+        if len(selected_nodes) == 2:
+            startNode = selected_nodes[0]
+            goalNode = selected_nodes[1]
+
+            startState = node_dict[startNode]
+            goalState = node_dict[goalNode]
+
+            route = find_shortest_path(startState, goalState)
+
+            ax.clear()
+
+            ox.plot_graph(G, node_size=10, edge_linewidth=1, ax=ax, show=False, close=False)
+
+            ox.plot_graph_route(G, route, route_color='g', route_linewidth=4, node_size=10, bgcolor='white', ax=ax, show=False)
+
+            x = (G.nodes[startNode]["x"], G.nodes[goalNode]["x"])
+            y = (G.nodes[startNode]["y"], G.nodes[goalNode]["y"])
+            ax.scatter(x, y, s=100, c="r", alpha=0.5, edgecolor="none") 
+
+            canvas.draw()
+
+            selected_nodes.clear()
+        
+        canvas.draw()
+
+
+
+
